@@ -2,7 +2,7 @@ import App from "../core/app"
 import Container from "../core/container"
 import Logger from "../core/logger"
 import Route from "../core/route"
-import express, { Express, Request, Response } from "express"
+import express, { Express, NextFunction, Request, Response } from "express"
 
 export type ExpressAppParams = {
   container: Container
@@ -22,7 +22,11 @@ export default class ExpressApp implements App {
     this.logger = logger
     this.port = port
 
-    this.container.register({ name: "logger", registration: logger, type: "value" })
+    this.container.register({
+      name: "logger",
+      registration: logger,
+      type: "value",
+    })
     this.express.on("close", () => this.container.dispose())
   }
 
@@ -42,11 +46,25 @@ export default class ExpressApp implements App {
   }
 
   private createRoute(route: Route, scope: Container) {
-    return (request: Request, response: Response) => {
-      scope.register({ name: "request", registration: request, type: "value" })
+    return (request: Request, response: Response, next: NextFunction) => {
+      scope.register({
+        name: "next",
+        registration: next,
+        type: "value",
+      })
+      scope.register({
+        name: "request",
+        registration: request,
+        type: "value",
+      })
       scope.register({
         name: "response",
         registration: response.status(route.responseCode),
+        type: "value",
+      })
+      scope.register({
+        name: "schemas",
+        registration: route.schemas,
         type: "value",
       })
 
