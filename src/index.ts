@@ -1,19 +1,21 @@
-import { Hono } from "hono"
-import { serveStatic } from "hono/serve-static.bun"
+import App from "../app"
+import Route from "../core/route"
 
-const port = parseInt(process.env.PORT) || 3000
+const app = new App()
 
-const app = new Hono()
+app.registerStaticFolder("public")
 
-app.use("/favicon.ico", serveStatic({ path: "./public/favicon.ico" }))
+app.container.loadModules([
+  "src/routes/**/*.route.ts",
+  "src/routes/**/*.route.tsx",
+  "src/services/**/*.ts",
+  "src/middleware/**/*.ts",
+])
 
-app.get("/", (c) => {
-  return c.json({ message: "Hello World!" })
+app.container.registrations(/Route/).forEach((routeName) => {
+  app.logger.info(`Created route ${routeName}`)
+  const route = app.container.resolve<Route>(routeName)
+  app.registerRoute(route)
 })
 
-console.log(`Running at http://localhost:${port}`)
-
-export default {
-  port,
-  fetch: app.fetch,
-}
+app.start()
