@@ -1,13 +1,13 @@
 import Route from "../../../core/route"
 import { Send } from "../../middleware/send"
 
-export default function listsIndex(): Route {
+export default function listsTableFunction(): Route {
   return {
     method: "get",
-    path: "/lists",
+    path: "/lists_table",
     responseCode: 200,
     handle: (send: Send) => {
-      return send("hello world")
-    },
+      return send("users table")
+    }
   }
 }
