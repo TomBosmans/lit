@@ -5,6 +5,7 @@
     "bun-types": "latest"
   },
   "dependencies": {
+    "awilix": "^8.0.1",
     "hono": "^2.2.5",
     "rome": "^12.1.3"
   },
